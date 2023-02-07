@@ -1,0 +1,7 @@
+export const Props = {
+  ACCOUNT: "ACCOUNT",
+  ENVIRONMENT: "ENVIRONMENT",
+  REGION: "REGION",
+  STAGE: "STAGE",
+  DOMAIN: "DOMAIN",
+};
