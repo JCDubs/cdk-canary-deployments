@@ -1,6 +1,5 @@
 import * as apiGateway from "aws-cdk-lib/aws-apigateway";
 import { Construct } from "constructs";
-import { namingUtils } from "../utils/naming-utils";
 import { coreConfig } from "../config/core-config";
 import { HttpMethod } from "../utils/http-method";
 import * as logs from "aws-cdk-lib/aws-logs";
@@ -87,13 +86,9 @@ export class API extends apiGateway.RestApi {
       ...fixedProps,
       deploy: props.deploy ?? false,
       ...(props.deploy && { deployOptions }),
-      restApiName: namingUtils.createResourceName(
-        props.apiName,
-        this.resourceType
-      ),
     });
 
-    new CfnOutput(scope, `${props.apiName}APIGatewayRestApiId`, {
+    new CfnOutput(scope, `APIGatewayRestApiId`, {
       value: api.restApiId,
     });
     return api;

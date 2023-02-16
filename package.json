@@ -1,18 +1,20 @@
 {
-  "name": "cdk-l4-lambda",
-  "version": "0.1.0",
+  "name": "create-product",
+  "version": "1.1.2",
+  "scripts": {
+    "pre:deploy": "npm version",
+    "deploy": "cdk deploy --outputs-file ./cdk-outputs.json --all",
+    "synth": "cdk synth --outputs-file ./cdk-outputs.json --all",
+    "remove": "cdk destroy --all"
+  },
   "bin": {
     "cdk-l4-lambda": "bin/cdk-l4-lambda.js"
-  },
-  "scripts": {
-    "deploy": "cdk deploy --outputs-file ./cdk-outputs.json --all",
-    "remove": "cdk destroy --all"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.110",
     "@types/jest": "^29.2.5",
     "@types/node": "18.11.18",
-    "aws-cdk": "2.62.1",
+    "aws-cdk-lib": "^2.62.2",
     "esbuild": "^0.17.5",
     "jest": "^29.3.1",
     "ts-jest": "^29.0.3",
@@ -24,12 +26,12 @@
     "@aws-lambda-powertools/metrics": "^1.5.1",
     "@aws-lambda-powertools/tracer": "^1.5.1",
     "@aws-sdk/client-dynamodb": "^3.261.0",
+    "@aws-sdk/client-s3": "^3.266.1",
     "@dazn/lambda-powertools-middleware-log-timeout": "^1.29.0",
     "@middy/core": "^4.0.7",
     "@middy/http-event-normalizer": "^4.0.7",
     "@middy/http-json-body-parser": "^4.0.7",
     "@middy/http-response-serializer": "^4.0.7",
-    "aws-cdk-lib": "2.62.1",
     "aws-lambda": "^1.0.7",
     "constructs": "^10.0.0",
     "convict": "^6.2.4",

@@ -14,7 +14,7 @@ import { MetricUnits } from "@aws-lambda-powertools/metrics";
 const serviceName = "createCustomerAccount";
 const nameSpace = serviceName;
 const metrics = Metrics.getMetrics(serviceName, nameSpace);
-const dynamoDBService = new DynamoDBService();
+const s3Service = new DynamoDBService();
 
 /**
  * Create a new product.
@@ -27,7 +27,7 @@ export const createProductHandler: Handler<NewProduct, IProduct> = async (
   try {
     logger.info("Received create product request", { product: event.body });
     metrics.addMetric(CREATE_PRODUCT_API_CALL, MetricUnits.Count, 1);
-    const product = await dynamoDBService.createProduct(event.body);
+    const product = await s3Service.createProduct(event.body);
     logger.info("Product saved, returning saved product details", { product });
     return {
       statusCode: 201,

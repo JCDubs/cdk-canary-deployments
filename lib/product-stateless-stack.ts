@@ -1,10 +1,11 @@
 import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
-import { Lambda } from "../shared/l4/lambda";
+import { Lambda } from "../shared/L3/lambda";
 import path from "path";
-import { API } from "../shared/l4/api";
+import { API } from "../shared/L3/api";
 import { HttpMethod } from "../shared/utils/http-method";
 import { Table } from "aws-cdk-lib/aws-dynamodb";
+import { LambdaDeploymentConfig } from "aws-cdk-lib/aws-codedeploy";
 
 /**
  * ProductStatefulStackProps contains properties required by the ProductStatefulStack.
@@ -30,56 +31,38 @@ export class ProductStatelessStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: ProductStatelessStackProps) {
     super(scope, id, props);
 
-    // Create the public API.
+    // Create the API.
     const productApi = API.create(this, "ProductApi", {
       ...props,
       apiName: "ProductApi",
-      description: "Product API",
+      description: "Product API update",
       deploy: true,
     });
 
-    // Create the get product lambda
-    const getProductLambda = Lambda.create(this, "GetProductLambda", {
-      entry: path.join(
-        __dirname,
-        "../src/handler/get-product-function/index.ts"
-      ),
-      description: "Get a product by product id",
-      serviceName: "getProductFunction",
-      environment: {
-        TABLE_NAME: props.productTable.tableName,
-        INDEX_NAME: props.productIdIndexName,
-      },
-    });
-
     // Create the create product lambda
-    const createProductLambda = Lambda.create(this, "CreateProductLambda", {
+    const createProductLambda = Lambda.create(this, "CreateProduct", {
       entry: path.join(
         __dirname,
         "../src/handler/create-product-function/index.ts"
       ),
       description: "Create a product",
-      serviceName: "createProductFunction",
+      serviceName: "createProduct",
       environment: {
         TABLE_NAME: props.productTable.tableName,
       },
     });
 
-    props.productTable.grantReadData(getProductLambda);
+    // Create the blue green deployment as a 10% percent canary over 5 minutes.
+    createProductLambda.asBlueGreenDeployment(
+      LambdaDeploymentConfig.CANARY_10PERCENT_5MINUTES
+    );
+
     props.productTable.grantReadWriteData(createProductLambda);
 
-    // Create the create product api endpoint associating the path, HTTP Verb and function.
     productApi.addEndpoint({
       resourcePath: "/product",
       method: HttpMethod.POST,
       function: createProductLambda,
-    });
-
-    // Create the get product api endpoint associating the path, HTTP Verb and function.
-    productApi.addEndpoint({
-      resourcePath: "/product/{id}",
-      method: HttpMethod.GET,
-      function: getProductLambda,
     });
   }
 }

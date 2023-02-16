@@ -2,6 +2,7 @@ import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 import { RemovalPolicy } from "aws-cdk-lib";
+import * as s3 from "aws-cdk-lib/aws-s3";
 
 export interface ProductStatefulStackProps extends cdk.StackProps {
   productIdIndexName: string;
@@ -13,6 +14,8 @@ export interface ProductStatefulStackProps extends cdk.StackProps {
  */
 export class ProductStatefulStack extends cdk.Stack {
   public readonly productTable: dynamodb.Table;
+  readonly productBucket: s3.Bucket;
+
   /**
    * Create the ProductStatefulStack.
    * @constructor

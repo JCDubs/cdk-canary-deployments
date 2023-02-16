@@ -9,7 +9,8 @@ const app = new cdk.App();
 const statefulStack = new ProductStatefulStack(app, "ProductStatefulStack", {
   productIdIndexName,
 });
-new ProductStatelessStack(app, "CdkL4LambdaStack", {
+new ProductStatelessStack(app, "ProductStatelessStack", {
   productIdIndexName,
   productTable: statefulStack.productTable,
+  // productBucket: statefulStack.productBucket,
 });
