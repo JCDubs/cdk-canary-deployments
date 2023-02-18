@@ -66,10 +66,5 @@ export class ProductStatelessStack extends cdk.Stack {
       method: HttpMethod.POST,
       function: createProductAlias,
     });
-
-    // createProductAlias.addPermission("PermitAPIGInvocation", {
-    //   principal: new ServicePrincipal("apigateway.amazonaws.com"),
-    //   sourceArn: productApi.arnForExecuteApi(HttpMethod.POST, "/product"),
-    // });
   }
 }
