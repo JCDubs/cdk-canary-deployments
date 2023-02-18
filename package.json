@@ -1,6 +1,6 @@
 {
   "name": "create-product",
-  "version": "1.1.2",
+  "version": "1.1.9",
   "scripts": {
     "pre:deploy": "npm version",
     "deploy": "cdk deploy --outputs-file ./cdk-outputs.json --all",

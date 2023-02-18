@@ -1,6 +1,10 @@
 {
   "ProductStatefulStack": {
-    "ExportsOutputFnGetAttProductTableB8D4E9EDArn9E8D595F": "arn:aws:dynamodb:eu-west-1:710208928232:table/ProductStatefulStack-ProductTableB8D4E9ED-QIQMOZ30GQPP",
-    "ExportsOutputRefProductTableB8D4E9ED1EF21745": "ProductStatefulStack-ProductTableB8D4E9ED-QIQMOZ30GQPP"
+    "ExportsOutputFnGetAttProductTableB8D4E9EDArn9E8D595F": "arn:aws:dynamodb:eu-west-1:710208928232:table/ProductStatefulStack-ProductTableB8D4E9ED-3MJHK4LM940F",
+    "ExportsOutputRefProductTableB8D4E9ED1EF21745": "ProductStatefulStack-ProductTableB8D4E9ED-3MJHK4LM940F"
+  },
+  "ProductStatelessStack": {
+    "APIGatewayRestApiId": "tadqop3zwe",
+    "ProductApiEndpoint760E02C8": "https://tadqop3zwe.execute-api.eu-west-1.amazonaws.com/test-2/"
   }
 }

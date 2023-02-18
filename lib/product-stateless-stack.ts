@@ -6,6 +6,8 @@ import { API } from "../shared/L3/api";
 import { HttpMethod } from "../shared/utils/http-method";
 import { Table } from "aws-cdk-lib/aws-dynamodb";
 import { LambdaDeploymentConfig } from "aws-cdk-lib/aws-codedeploy";
+import * as apiGateway from "aws-cdk-lib/aws-apigateway";
+import { ServicePrincipal } from "aws-cdk-lib/aws-iam";
 
 /**
  * ProductStatefulStackProps contains properties required by the ProductStatefulStack.
@@ -40,21 +42,21 @@ export class ProductStatelessStack extends cdk.Stack {
     });
 
     // Create the create product lambda
-    const createProductLambda = Lambda.create(this, "CreateProduct", {
+    const createProductLambda = Lambda.create(this, "CreateCityProduct", {
       entry: path.join(
         __dirname,
         "../src/handler/create-product-function/index.ts"
       ),
-      description: "Create a product",
-      serviceName: "createProduct",
+      description: "Create a product with change - alias is live-1",
+      serviceName: "createCityProduct",
       environment: {
         TABLE_NAME: props.productTable.tableName,
       },
     });
 
     // Create the blue green deployment as a 10% percent canary over 5 minutes.
-    createProductLambda.asBlueGreenDeployment(
-      LambdaDeploymentConfig.CANARY_10PERCENT_5MINUTES
+    const createProductAlias = createProductLambda.asBlueGreenDeployment(
+      LambdaDeploymentConfig.CANARY_10PERCENT_15MINUTES
     );
 
     props.productTable.grantReadWriteData(createProductLambda);
@@ -62,7 +64,12 @@ export class ProductStatelessStack extends cdk.Stack {
     productApi.addEndpoint({
       resourcePath: "/product",
       method: HttpMethod.POST,
-      function: createProductLambda,
+      function: createProductAlias,
     });
+
+    // createProductAlias.addPermission("PermitAPIGInvocation", {
+    //   principal: new ServicePrincipal("apigateway.amazonaws.com"),
+    //   sourceArn: productApi.arnForExecuteApi(HttpMethod.POST, "/product"),
+    // });
   }
 }

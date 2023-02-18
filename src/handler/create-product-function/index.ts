@@ -16,22 +16,33 @@ const nameSpace = serviceName;
 const metrics = Metrics.getMetrics(serviceName, nameSpace);
 const s3Service = new DynamoDBService();
 
+type response = {
+  message: string;
+};
+
 /**
  * Create a new product.
  * @param {NewProduct} event - An API Gateway event containing a NewProduct as the body.
  * @returns {IProduct} - The newly created product as the response body.
  */
-export const createProductHandler: Handler<NewProduct, IProduct> = async (
+export const createProductHandler: Handler<NewProduct, response> = async (
   event
 ) => {
+  // throw Error("test error");
   try {
     logger.info("Received create product request", { product: event.body });
     metrics.addMetric(CREATE_PRODUCT_API_CALL, MetricUnits.Count, 1);
     const product = await s3Service.createProduct(event.body);
     logger.info("Product saved, returning saved product details", { product });
+    // return {
+    //   statusCode: 201,
+    //   body: product,
+    // };
     return {
       statusCode: 201,
-      body: product,
+      body: {
+        message: "alias is live-1",
+      },
     };
   } catch (err) {
     const error = err as Error;

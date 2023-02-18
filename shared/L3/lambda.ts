@@ -8,7 +8,12 @@ import { deploymentUtils } from "../utils/deployment-utils";
 import { LogLevel } from "../types/log-level";
 import { namingUtils } from "../utils/naming-utils";
 import { Duration, RemovalPolicy } from "aws-cdk-lib";
-import { Alias, Architecture, Tracing } from "aws-cdk-lib/aws-lambda";
+import {
+  Alias,
+  Architecture,
+  QualifiedFunctionBase,
+  Tracing,
+} from "aws-cdk-lib/aws-lambda";
 import { Construct } from "constructs";
 import { Alarm } from "aws-cdk-lib/aws-cloudwatch";
 import {
@@ -131,24 +136,25 @@ export class Lambda extends NodejsFunction implements Deployable {
 
   /**
    * Set the function as a blue green deployment.
-   * @param lambdaDeploymentConfig {LambdaDeploymentConfig} - Optional LambdaDeploymentConfig value.
-   * @default { LambdaDeploymentConfig.ALL_AT_ONCE }
+   * @param {LambdaDeploymentConfig} lambdaDeploymentConfig - Optional LambdaDeploymentConfig value.
+   * @default {LambdaDeploymentConfig.ALL_AT_ONCE}
+   * @returns {QualifiedFunctionBase} - The alias created for the blue green deployment.
    */
   asBlueGreenDeployment(
     lambdaDeploymentConfig?: ILambdaDeploymentConfig
-  ): void {
+  ): QualifiedFunctionBase {
     const newVersion = this.currentVersion;
     newVersion.applyRemovalPolicy(RemovalPolicy.RETAIN);
 
-    const alias = new Alias(this, "CanaryAlias", {
-      aliasName: "CanaryDeployment",
+    const alias = new Alias(this, "BlueGreenAlias", {
+      aliasName: "live",
       version: newVersion,
     });
 
     const failureAlarm = new Alarm(this, "DeploymentAlarm", {
       metric: alias.metricErrors(),
       threshold: 1,
-      alarmDescription: `${this.functionName} ${newVersion.version} canary deployment failure alarm`,
+      alarmDescription: `${this.functionName} ${newVersion.version} blue green deployment failure alarm`,
       evaluationPeriods: 1,
     });
 
@@ -158,5 +164,6 @@ export class Lambda extends NodejsFunction implements Deployable {
         lambdaDeploymentConfig ?? LambdaDeploymentConfig.ALL_AT_ONCE,
       alarms: [failureAlarm],
     });
+    return alias;
   }
 }

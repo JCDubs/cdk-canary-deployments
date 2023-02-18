@@ -4,7 +4,8 @@ import { coreConfig } from "../config/core-config";
 import { HttpMethod } from "../utils/http-method";
 import * as logs from "aws-cdk-lib/aws-logs";
 import { CfnOutput } from "aws-cdk-lib";
-import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
+import { deploymentUtils } from "../utils/deployment-utils";
+import { QualifiedFunctionBase } from "aws-cdk-lib/aws-lambda";
 
 const fixedProps: Omit<apiGateway.LambdaRestApiProps, "handler"> = {
   minimumCompressionSize: 0,
@@ -19,7 +20,7 @@ const fixedProps: Omit<apiGateway.LambdaRestApiProps, "handler"> = {
 export type APIEndpoint = {
   resourcePath: string;
   method: HttpMethod;
-  function: NodejsFunction;
+  function: QualifiedFunctionBase;
 };
 
 /**
@@ -105,6 +106,7 @@ export class API extends apiGateway.RestApi {
       resourceToAdd.method,
       new apiGateway.LambdaIntegration(resourceToAdd.function, {
         proxy: true,
+        allowTestInvoke: deploymentUtils.isTestEnvironment(),
       })
     );
     return this;
